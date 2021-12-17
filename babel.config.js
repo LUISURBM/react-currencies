@@ -1,6 +1,9 @@
 module.exports = {
   "presets": [
-    "react-app"
+    "react-app",
+    ['@babel/preset-typescript', {
+      onlyRemoveTypeImports: true,
+  }]
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",

@@ -4,17 +4,17 @@ const defaultState = {
   alertsList: [
     {
       id: 0,
-      title: 'Sales Report',
-      value: 16,
+      title: '10999',
+      value: 26,
       color: 'primary',
-      footer: 'Calculating x-axis bias... 65%',
+      footer: "Creando 'recipient'... 65%",
     },
     {
       id: 1,
-      title: 'Personal Responsibility',
-      value: 23,
-      color: 'danger',
-      footer: 'Provide required notes',
+      title: '109998',
+      value: 73,
+      color: 'success',
+      footer: "Guardando 'payment'",
     },
   ],
 };

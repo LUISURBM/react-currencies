@@ -17,23 +17,29 @@ import { Sparklines, SparklinesBars } from "react-sparklines";
 
 import Widget from "../../../components/Widget";
 import s from "./Static.module.scss";
+import { order, desembolsos } from "./mock";
+import { toast } from "react-toastify";
 
 class Static extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
+      countries: [],
       tableStyles: [
         {
           id: 1,
           picture: require("../../../assets/tables/1.png"), // eslint-disable-line global-require
-          description: "Palo Alto",
+          description: "Monto base",
+          label: {
+            colorClass: "primary",
+            text: "Enviar",
+          },
           info: {
-            type: "JPEG",
-            dimensions: "200x150",
+            type: "NUEVO",
+            total: 0,
           },
           date: new Date("September 14, 2012"),
-          size: "45.6 KB",
+          size: 1,
           progress: {
             percent: 29,
             colorClass: "success",
@@ -42,13 +48,17 @@ class Static extends React.Component {
         {
           id: 2,
           picture: require("../../../assets/tables/2.png"), // eslint-disable-line global-require
-          description: "The Sky",
+          description: "Monto destino",
+          label: {
+            colorClass: "primary",
+            text: "Enviar",
+          },
           info: {
-            type: "PSD",
-            dimensions: "2400x1455",
+            type: "NUEVO",
+            total: 0,
           },
           date: new Date("November 14, 2012"),
-          size: "15.3 MB",
+          size: 1,
           progress: {
             percent: 33,
             colorClass: "warning",
@@ -57,17 +67,17 @@ class Static extends React.Component {
         {
           id: 3,
           picture: require("../../../assets/tables/3.png"), // eslint-disable-line global-require
-          description: "Down the road",
+          description: "Maximización",
           label: {
             colorClass: "primary",
-            text: "INFO!",
+            text: "Enviar",
           },
           info: {
-            type: "JPEG",
-            dimensions: "200x150",
+            type: "NUEVO",
+            total: 0,
           },
           date: new Date("September 14, 2012"),
-          size: "49.0 KB",
+          size: 1,
           progress: {
             percent: 38,
             colorClass: "inverse",
@@ -76,13 +86,17 @@ class Static extends React.Component {
         {
           id: 4,
           picture: require("../../../assets/tables/4.png"), // eslint-disable-line global-require
-          description: "The Edge",
+          description: "Monto directo",
+          label: {
+            colorClass: "primary",
+            text: "Enviar",
+          },
           info: {
-            type: "PNG",
-            dimensions: "210x160",
+            type: "NUEVO",
+            total: 0,
           },
           date: new Date("September 15, 2012"),
-          size: "69.1 KB",
+          size: 1,
           progress: {
             percent: 17,
             colorClass: "danger",
@@ -91,13 +105,32 @@ class Static extends React.Component {
         {
           id: 5,
           picture: require("../../../assets/tables/5.png"), // eslint-disable-line global-require
-          description: "Fortress",
+          description: "Ordenes con problemas",
           info: {
-            type: "JPEG",
-            dimensions: "1452x1320",
+            type: "NUEVO",
+            total: 0,
           },
           date: new Date("October 1, 2012"),
-          size: "2.3 MB",
+          size: 1,
+          progress: {
+            percent: 41,
+            colorClass: "primary",
+          },
+        },
+        {
+          id: 6,
+          picture: require("../../../assets/tables/5.png"), // eslint-disable-line global-require
+          description: "Ordenes combinadas",
+          label: {
+            colorClass: "primary",
+            text: "Enviar",
+          },
+          info: {
+            type: "NUEVO",
+            total: 0,
+          },
+          date: new Date("October 1, 2012"),
+          size: 1,
           progress: {
             percent: 41,
             colorClass: "primary",
@@ -107,25 +140,49 @@ class Static extends React.Component {
       checkboxes1: [false, true, false, false],
       checkboxes2: [false, false, false, false, false, false],
       checkboxes3: [false, false, false, false, false, false],
+      options: {
+        position: "top-right",
+        autoClose: 5000,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+      },
     };
 
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    fetch("http://localhost:8090/batch/country", requestOptions).then((response) => response.json()
+    ).then((response) => {
+      this.setState({
+        countries: response
+      })
+    }
+    );
     this.checkAll = this.checkAll.bind(this);
+    this.checkCountry = this.checkCountry.bind(this);
+
   }
 
   parseDate(date) {
     this.dateSet = date.toDateString().split(" ");
 
-    return `${date.toLocaleString("en-us", { month: "long" })} ${
-      this.dateSet[2]
-    }, ${this.dateSet[3]}`;
+    return `${date.toLocaleString("en-us", { month: "long" })} ${this.dateSet[2]
+      }, ${this.dateSet[3]}`;
   }
 
   checkAll(ev, checkbox) {
-    const checkboxArr = new Array(this.state[checkbox].length).fill(
-      ev.target.checked
-    );
+    const countriesToBeFiltered = [...this.state.countries];
+    const countriesFiltered = countriesToBeFiltered.map(c => {
+      c[3] = ev.target.checked;
+      return c;
+    })
+    const ceckboxvalue = this.state.countries.filter(c => c[3] === true).length === this.state.countries.length;
     this.setState({
-      [checkbox]: checkboxArr,
+      [checkbox]: ceckboxvalue,
+      countries: countriesFiltered,
     });
   }
 
@@ -141,91 +198,96 @@ class Static extends React.Component {
     });
   }
 
+  checkCountry(id, ev) {
+    let countriesToUpdate = [...this.state.countries];
+    countriesToUpdate[id][3] = countriesToUpdate[id][2] && ev.target.checked
+    this.setState({ countries: countriesToUpdate });
+
+  }
+
   render() {
     return (
       <div className={s.root}>
         <h2 className="page-title">
-          Tables - <span className="fw-semi-bold">Static</span>
+          Desembolsos - <span className="fw-semi-bold">MOCKUP</span>
         </h2>
         <Row>
           <Col lg={6} md={12} sm={12}>
             <Widget
               title={
                 <h5>
-                  Table <span className="fw-semi-bold">Styles</span>
+                  Ejecutar <span className="fw-semi-bold">Escenario</span>
                 </h5>
               }
               settings
               close
               bodyClass={s.mainTableWidget}
             >
-            <div className={s.overFlow}>
-              <Table lg={12} md={12} sm={12} striped>
-                <thead>
-                  <tr className="fs-sm">
-                    <th className="hidden-sm-down">#</th>
-                    <th>Picture</th>
-                    <th>Description</th>
-                    <th className="hidden-sm-down">Info</th>
-                    <th className="hidden-sm-down">Date</th>
-                    <th className="hidden-sm-down">Size</th>
-                    <th className="hidden-sm-down">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.tableStyles.map((row) => (
-                    <tr key={row.id}>
-                      <td>{row.id}</td>
-                      <td>
-                        <img
-                          className="img-rounded"
-                          src={row.picture}
-                          alt=""
-                          height="50"
-                        />
-                      </td>
-                      <td>
-                        {row.description}
-                        {row.label && (
-                          <div>
-                            <Badge color={row.label.colorClass}>
-                              {row.label.text}
-                            </Badge>
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        <p className="mb-0">
-                          <small>
-                            Type:
-                            <span className="text-muted fw-semi-bold">
-                              &nbsp; {row.info.type}
-                            </span>
-                          </small>
-                        </p>
-                        <p>
-                          <small>
-                            Dimensions:
-                            <span className="text-muted fw-semi-bold">
-                              &nbsp; {row.info.dimensions}
-                            </span>
-                          </small>
-                        </p>
-                      </td>
-                      <td className="text-muted">{this.parseDate(row.date)}</td>
-                      <td className="text-muted">{row.size}</td>
-                      <td className="width-150">
-                        <Progress
-                          color={row.progress.colorClass}
-                          value={row.progress.percent}
-                          className="progress-sm mb-xs"
-                        />
-                      </td>
+              <div className={s.overFlow}>
+                <Table lg={12} md={12} sm={12} striped>
+                  <thead>
+                    <tr className="fs-sm">
+                      <th>Escenario</th>
+                      <th className="hidden-sm-down">Info</th>
+                      <th className="hidden-sm-down">Últ. Ejecución</th>
+                      <th className="hidden-sm-down">Ordenes</th>
+                      <th className="hidden-sm-down">Completados</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {this.state.tableStyles.map((row, index) => (
+                      <tr key={row.id}>
+                        <td >
+                          {row.description}
+                          {row.label && (
+                            <div>
+                              <Button
+                                disabled={(!this.state.countries || this.state.countries.filter(e => e[3]).length <= 0)}
+                                className="mr-2" size="sm" color={row.label.colorClass} onClick={() => { this.toggle(row, index); }}>
+                                {row.label.text}
+                              </Button>
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <p className="mb-0">
+                            <small>
+                              Type:
+                              <span className="text-muted fw-semi-bold">
+                                &nbsp; {row.info.type}
+                              </span>
+                            </small>
+                          </p>
+                          <p>
+                            <small>
+                              Total USD:
+                              <span className="text-muted fw-semi-bold">
+                                &nbsp; {row.info.total}
+                              </span>
+                            </small>
+                          </p>
+                        </td>
+                        <td className="text-muted">{this.parseDate(row.date)}</td>
+                        <td className="text-muted">
+                          <Input
+                            id="batchSize"
+                            type="number"
+                            defaultValue={row.size}
+                            onChange={this.handleChange.bind(this, index)}
+                          />
+                        </td>
+                        <td className="width-150">
+                          <Progress
+                            color={row.progress.colorClass}
+                            value={row.progress.percent}
+                            className="progress-sm mb-xs"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
               <div className="clearfix">
                 <div className="float-right">
                   <Button color="default" className="mr-2" size="sm">
@@ -257,534 +319,54 @@ class Static extends React.Component {
             <Widget
               title={
                 <h5>
-                  Table <span className="fw-semi-bold">Styles</span>
+                  Configurar <span className="fw-semi-bold">Paises</span>
                 </h5>
               }
               settings
               close
             >
-              <h3>
-                Stripped <span className="fw-semi-bold">Table</span>
-              </h3>
-
-              <p>
-                Each row is highlighted. You will never lost there. Just{" "}
-                <code>.table-striped</code> it.
-              </p>
               <div className={`widget-table-overflow ${s.overFlow}`}>
-              <Table className="table-striped">
-                <thead>
-                  <tr>
-                    <th>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox1"
-                          type="checkbox"
-                          checked={this.state.checkboxes1[0]}
-                          onChange={(event) =>
-                            this.checkAll(event, "checkboxes1")
-                          }
-                        />
-                        <Label for="checkbox1" />
-                      </div>
-                    </th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Info</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox2"
-                          type="checkbox"
-                          checked={this.state.checkboxes1[1]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes1", 1)
-                          }
-                        />
-                        <Label for="checkbox2" />
-                      </div>
-                    </td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>
-                      <Badge color="danger">Online</Badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox3"
-                          type="checkbox"
-                          checked={this.state.checkboxes1[2]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes1", 2)
-                          }
-                        />
-                        <Label for="checkbox3" />
-                      </div>
-                    </td>
-                    <td>
-                      Jacob{" "}
-                      <Badge color="warning" className="ml-2">
-                        ALERT!
-                      </Badge>
-                    </td>
-                    <td>Thornton</td>
-                    <td>
-                      <span className="text-secondary badge badge-gray">
-                        Away
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox4"
-                          type="checkbox"
-                          checked={this.state.checkboxes1[3]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes1", 3)
-                          }
-                        />
-                        <Label for="checkbox4" />
-                      </div>
-                    </td>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>
-                      <Badge color="danger">Construct</Badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-              </div>
-              <br />
-              <br />
-              <h3>
-                Hover <span className="fw-semi-bold">Table</span>
-              </h3>
-              <p>
-                {"Trace only what's really important. "}
-                <code>.table-hover</code> is made for it.
-              </p>
-              <div className={s.overFlow}>
-                <Table className="table-hover">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  {/* eslint-disable */}
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>Mark</td>
-                      <td>Otto</td>
-                      <td>
-                        <a href="#">ottoto@example.com</a>
-                      </td>
-                      <td>
-                        <Badge color="gray" className="text-secondary" pill>
-                          Pending
-                        </Badge>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>Jacob</td>
-                      <td>Thornton</td>
-                      <td>
-                        <a href="#">fat.thor@example.com</a>
-                      </td>
-                      <td>
-                        <Badge color="gray" className="text-secondary" pill>
-                          Unconfirmed
-                        </Badge>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Larry</td>
-                      <td>the Bird</td>
-                      <td>
-                        <a href="#">larry@example.com</a>
-                      </td>
-                      <td>
-                        <Badge color="primary" className="text-secondary" pill>
-                          New
-                        </Badge>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>Peter</td>
-                      <td>Horadnia</td>
-                      <td>
-                        <a href="#">peter@example.com</a>
-                      </td>
-                      <td>
-                        <Badge color="success" className="text-secondary" pill>
-                          Active
-                        </Badge>
-                      </td>
-                    </tr>
-                  </tbody>
-                  {/* eslint-enable */}
-                </Table>
-                </div>
-            </Widget>
-          </Col>
-        </Row>
-        <Row> 
-          <Col lg={6} md={6} sm={12}>
-            <Widget
-              title={
-                <h5>
-                  Table <span className="fw-semi-bold">Styles</span>
-                </h5>
-              }
-              settings
-              close
-            >
-              <h3>
-                Bordered <span className="fw-semi-bold">Table</span>
-              </h3>
-              <p>
-                Each row is highlighted. You will never lost there. That&apos;s
-                how all of us learned in school the table should look like. Just
-                add
-                <code>.table-bordered</code> to it.
-              </p>
-              <div className={`widget-table-overflow ${s.overFlow}`}>
-              <Table className="table-bordered table-lg mt-lg mb-0">
-                <thead className="text-uppercase">
-                  <tr>
-                    <th>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox10"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[0]}
-                          onChange={(event) =>
-                            this.checkAll(event, "checkboxes2")
-                          }
-                        />
-                        <Label for="checkbox10" />
-                      </div>
-                    </th>
-                    <th>Product</th>
-                    <th className="text-right">Price</th>
-                    <th className="text-center">Sales</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox11"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[1]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes2", 1)
-                          }
-                        />
-                        <Label for="checkbox11" />
-                      </div>
-                    </td>
-                    <td>On the Road</td>
-                    <td className="text-right">$25 224.2</td>
-                    <td className="text-center">
-                      <Sparklines
-                        data={[13, 14, 16, 15, 4, 14, 20]}
-                        style={{ width: "35px", height: "20px" }}
-                      >
-                        <SparklinesBars style={{ fill: "#1870DC" }} />
-                      </Sparklines>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox12"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[2]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes2", 2)
-                          }
-                        />
-                        <Label for="checkbox12" />
-                      </div>
-                    </td>
-                    <td>HP Core i7</td>
-                    <td className="text-right">$87 346.1</td>
-                    <td className="text-center">
-                      <Sparklines
-                        data={[14, 12, 16, 11, 17, 19, 16]}
-                        style={{ width: "35px", height: "20px" }}
-                      >
-                        <SparklinesBars style={{ fill: "#58D777" }} />
-                      </Sparklines>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox13"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[3]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes2", 3)
-                          }
-                        />
-                        <Label for="checkbox13" />
-                      </div>
-                    </td>
-                    <td>Let&apos;s Dance</td>
-                    <td className="text-right">$57 944.6</td>
-                    <td className="text-center">
-                      <Sparklines
-                        data={[11, 17, 19, 16, 14, 12, 16]}
-                        style={{ width: "35px", height: "20px" }}
-                      >
-                        <SparklinesBars style={{ fill: "#f0af03" }} />
-                      </Sparklines>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox14"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[4]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes2", 4)
-                          }
-                        />
-                        <Label for="checkbox14" />
-                      </div>
-                    </td>
-                    <td>Air Pro</td>
-                    <td className="text-right">$118 533.1</td>
-                    <td className="text-center">
-                      <Sparklines
-                        data={[13, 14, 20, 16, 15, 4, 14]}
-                        style={{ width: "35px", height: "20px" }}
-                      >
-                        <SparklinesBars style={{ fill: "#F45722" }} />
-                      </Sparklines>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="abc-checkbox">
-                        <Input
-                          id="checkbox15"
-                          type="checkbox"
-                          checked={this.state.checkboxes2[5]}
-                          onChange={(event) =>
-                            this.changeCheck(event, "checkboxes2", 5)
-                          }
-                        />
-                        <Label for="checkbox15" />
-                      </div>
-                    </td>
-                    <td>Version Control</td>
-                    <td className="text-right">$72 854.5</td>
-                    <td className="text-center">
-                      <Sparklines
-                        data={[16, 15, 4, 14, 13, 14, 20]}
-                        style={{ width: "35px", height: "20px" }}
-                      >
-                        <SparklinesBars style={{ fill: "#4ebfbb" }} />
-                      </Sparklines>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-              </div>
-            </Widget>
-          </Col>
-          <Col lg={6} md={6} sm={12}> 
-            <Widget
-              title={
-                <h5>
-                  Table <span className="fw-semi-bold">Styles</span>
-                </h5>
-              }
-              settings
-              close
-            >
-              <h3>
-                Overflow <span className="fw-semi-bold">Table</span>
-              </h3>
-              <p>
-                Add any non-bordered .table within a widget for a seamless
-                design. Awesome look for no cost. Just wrap the table with
-                simple css class <code>.widget-table-overflow</code> inside of
-                widget
-              </p>
-              <div className={`widget-table-overflow ${s.overFlow}`}>
-                <Table className="table-striped table-lg mt-lg mb-0">
+                <Table className="table-striped">
                   <thead>
                     <tr>
                       <th>
                         <div className="abc-checkbox">
                           <Input
-                            id="checkbox20"
+                            id="checkbox1"
                             type="checkbox"
-                            checked={this.state.checkboxes3[0]}
+                            checked={this.state.checkbox1}
                             onChange={(event) =>
-                              this.checkAll(event, "checkboxes3")
+                              this.checkAll(event, "checkbox1")
                             }
                           />
-                          <Label for="checkbox20" />
+                          <Label for="checkbox1" />
                         </div>
                       </th>
-                      <th>Product</th>
-                      <th className="text-right">Price</th>
-                      <th className="text-center">Sales</th>
+                      <th>CURRENCY</th>
+                      <th>COUNTRY</th>
+                      <th>ACCOUNT TYPE</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>
-                        <div className="abc-checkbox">
-                          <Input
-                            id="checkbox21"
-                            type="checkbox"
-                            checked={this.state.checkboxes3[1]}
-                            onChange={(event) =>
-                              this.changeCheck(event, "checkboxes3", 1)
-                            }
-                          />
-                          <Label for="checkbox21" />
-                        </div>
-                      </td>
-                      <td>On the Road</td>
-                      <td className="text-right">$25 224.2</td>
-                      <td className="text-center">
-                        <Sparklines
-                          data={[13, 14, 16, 15, 4, 14, 20]}
-                          style={{ width: "35px", height: "20px" }}
-                        >
-                          <SparklinesBars style={{ fill: "#1870DC" }} />
-                        </Sparklines>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div className="abc-checkbox">
-                          <Input
-                            id="checkbox22"
-                            type="checkbox"
-                            checked={this.state.checkboxes3[2]}
-                            onChange={(event) =>
-                              this.changeCheck(event, "checkboxes3", 2)
-                            }
-                          />
-                          <Label for="checkbox22" />
-                        </div>
-                      </td>
-                      <td>HP Core i7</td>
-                      <td className="text-right">$87 346.1</td>
-                      <td className="text-center">
-                        <Sparklines
-                          data={[14, 12, 16, 11, 17, 19, 16]}
-                          style={{ width: "35px", height: "20px" }}
-                        >
-                          <SparklinesBars style={{ fill: "#F45722" }} />
-                        </Sparklines>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div className="abc-checkbox">
-                          <Input
-                            id="checkbox23"
-                            type="checkbox"
-                            checked={this.state.checkboxes3[3]}
-                            onChange={(event) =>
-                              this.changeCheck(event, "checkboxes3", 3)
-                            }
-                          />
-                          <Label for="checkbox23" />
-                        </div>
-                      </td>
-                      <td>Let&apos;s Dance</td>
-                      <td className="text-right">$57 944.6</td>
-                      <td className="text-center">
-                        <Sparklines
-                          data={[11, 17, 19, 16, 14, 12, 16]}
-                          style={{ width: "35px", height: "20px" }}
-                        >
-                          <SparklinesBars style={{ fill: "#f0af03" }} />
-                        </Sparklines>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div className="abc-checkbox">
-                          <Input
-                            id="checkbox24"
-                            type="checkbox"
-                            checked={this.state.checkboxes3[4]}
-                            onChange={(event) =>
-                              this.changeCheck(event, "checkboxes3", 4)
-                            }
-                          />
-                          <Label for="checkbox24" />
-                        </div>
-                      </td>
-                      <td>Air Pro</td>
-                      <td className="text-right">$118 533.1</td>
-                      <td className="text-center">
-                        <Sparklines
-                          data={[13, 14, 20, 16, 15, 4, 14]}
-                          style={{ width: "35px", height: "20px" }}
-                        >
-                          <SparklinesBars style={{ fill: "#58D777" }} />
-                        </Sparklines>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div className="abc-checkbox">
-                          <Input
-                            id="checkbox25"
-                            type="checkbox"
-                            checked={this.state.checkboxes3[5]}
-                            onChange={(event) =>
-                              this.changeCheck(event, "checkboxes3", 5)
-                            }
-                          />
-                          <Label for="checkbox25" />
-                        </div>
-                      </td>
-                      <td>Version Control</td>
-                      <td className="text-right">$72 854.5</td>
-                      <td className="text-center">
-                        <Sparklines
-                          data={[16, 15, 4, 14, 13, 14, 20]}
-                          style={{ width: "35px", height: "20px" }}
-                        >
-                          <SparklinesBars style={{ fill: "#4ebfbb" }} />
-                        </Sparklines>
-                      </td>
-                    </tr>
+                    {this.state.countries.map((country, index) => (
+                      <tr key={index}>
+                        <td>
+                          <div className="abc-checkbox">
+                            <Input
+                              id={`${index}"countryOpt"`}
+                              type="checkbox"
+                              checked={this.state.countries[index][3]}
+                              onChange={this.checkCountry.bind(this, index)}
+                            />
+                            <Label for={`${index}"countryOpt"`} />
+                          </div>
+                        </td>
+                        <td>{country[0]}</td>
+                        <td>{country[1]}</td>
+                        <td>
+                          <Badge color={`{${country[2] ? "sucess" : "danger"}}`}>{country[2]}</Badge>
+                        </td></tr>
+                    ))}
                   </tbody>
                 </Table>
               </div>
@@ -794,6 +376,180 @@ class Static extends React.Component {
       </div>
     );
   }
+  handleChange(i, event) {
+    let values = [...this.state.tableStyles];
+    values[i].size = event.target.value;
+    this.setState({ tableStyles: values });
+  }
+  toggle(jobDetail, index) {
+    toast.success(
+      "Generando lote!",
+      this.state.options
+    );
+    let paymentsUpdated = this.state.tableStyles;
+    paymentsUpdated[index].date = new Date();
+    const pymt = {
+      bpyBacAccountNumber: "9781003",
+      bpyBacSwiftCode: "ITAUBRSP",
+      bpyPlisId: "46",
+      bpyBacBankAddress: "Agence Saclay Tech Point. 19",
+      bpyBacBankName: "BNP Paribas",
+      bpyBacCountryIsoCode: "USA",
+      bpyBacCurrencyIsoCode: "USD",
+      bpyCurrencyQty: "USD",
+      bpyCurrencyQty2: "USD",
+      bpyOrderQty1: "",
+      bpyOrderQty2: "",
+      bpyPadAddressLine: "Agence Saclay Tech Point. 19",
+      bpyPadPostalCode: "EC1N",
+      bpyPadCity: "London",
+      bpyPadState: "London",
+      bpyPaymentReference: "IDRojasACOLFUTURO",
+      bpyPrnEmail: "anilejo@hotmail.com",
+      bpyPrnFullname: "CAN2Anibal Alejandro R45",
+      bpyPrnMobileNumber: "7896541230",
+      ctdPersonTypeId: "1",
+      bpyRcptClientReferenceId: "15058",
+      bpyRoutingCodeValue: "200415",
+      bpyRoutingCodeType: "Transit",
+      bpySide: "1",
+      bpyTransactionPurpose: "OTHERS"
+    };
+    const availableCountry = this.state.countries.filter(c => c[3]);
+    const pymts = Array.from({ length: jobDetail.size }, (i) => {
+    // const pymts = desembolsos.map((i) => {
+      const generado = Math.floor(Math.random() * 713) + 10000;
+      const iPaisGenerado = Math.floor(Math.random() * availableCountry.length);
+      const bpyOrderQty1 = index == 1 ? undefined : (Math.floor(Math.random() * 10) + 5) * (index == 4 ? Math.floor(Math.random()) : 1);
+      const bpyOrderQty2 = index == 0 ? undefined : (Math.floor(Math.random() * 10) + 5) * (index == 4 ? Math.floor(Math.random()) : 1);
+      const bpyCurrencyQty = pymt.bpyCurrencyQty;
+      const bpyCurrencyQty2 = index == 3 || ((index == 4 ? 1 : 0) * (Math.floor(Math.random()))) ? 'USD' : availableCountry[iPaisGenerado][1];
+
+      const pymtsi = desembolsos[Math.floor(Math.random() * 5000)];
+      const rPayment = {
+        ...pymtsi,
+        // bpyBacAccountNumber: '9781003' + Math.floor(Math.random() * 9),
+        bpyBacAccountNumber: availableCountry[iPaisGenerado][1] !== "GBR" ? pymtsi.bpyBacAccountNumber.split(pymtsi.bpyBacSwiftCode)[1] : pymtsi.bpyBacAccountNumber,
+        bpyBacSwiftCode: `${availableCountry[iPaisGenerado][1]}${bpyCurrencyQty}${generado}${bpyCurrencyQty2}`,
+        bpyPlisId: generado,
+        bpyPrnFullname: `CTD${bpyCurrencyQty} ${generado}${bpyCurrencyQty2}CLIENT`,
+        bpyPaymentReference: `CTD${bpyCurrencyQty} ${generado}${bpyCurrencyQty2}CLIENT`,
+        bpyPadCity: `${bpyCurrencyQty}${generado}${bpyCurrencyQty2}`,
+        bpyPadState: `${bpyCurrencyQty}${generado}${bpyCurrencyQty2}`,
+        bpyBacCountryIsoCode: availableCountry[iPaisGenerado][1],
+        bpyRoutingCodeType: mapper.filter(m => Object.keys(m)[0] === availableCountry[iPaisGenerado][0]).map(m => m[Object.keys(m)[0]])[0],
+        // bpyRoutingCodeValue: ,
+        bpyBacCurrencyIsoCode: availableCountry[iPaisGenerado][1],
+        bpyOrderQty1: bpyOrderQty1,
+        bpyOrderQty2: bpyOrderQty2,
+        bpyCurrencyQty2: bpyCurrencyQty2,
+      };
+      return rPayment;
+    });
+
+    // const requestAuth = {
+    //   method: 'POST',
+    //   mode: 'cors',
+    //   headers: {
+    //     "Content-Type": "text/plain",
+    //     'Content-Type': 'aplication/json',
+    //     'Accept': '*/*',
+    //     'Accept-Encoding': 'gzip, deflate, br',
+    //     'Connection': 'keep-alive',
+    //     'Access-Control-Allow-Origin': 'http://localhost:3000',
+    //     'Access-Control-Allow-Methods': 'POST',
+    //     'Response-Type': 'json',
+    //     'Cache-Control': 'no-cache'
+    //   },
+    //   body: "grant_type=client_credentials&client_id=l764e7b61d3bc547018a00812e17c2d42e&client_secret=c4afc978965d4c3b8382c924f290e15c&scope=internal"
+    // };
+    // debugger
+
+    // fetch("https://uatapi.currenciesdirect.com/auth/oauth/v2/token", requestAuth).then((token) => token.json()).then(token => {
+
+    //   const requestRcpt = {
+    //     method: 'POST',
+    //     mode: 'no-cors',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': "Bearer " + token.access_token
+    //     },
+    //   };
+    //   fetch("https://uatapi.currenciesdirect.com/v1/customers/0201000002982640/recipients?page=1&limit=100", requestRcpt).then(response => response.json()).then((response) => {
+    //     console.dir(response);
+    //   });
+    // });
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "bchPlisId": '21' + new Date().getDate() + '' + new Date().getMonth(),
+        "bpyCountPayments": "1094",
+        "bpyUsrCreation": "LFUM",
+        "bpyUsrModification": "LFUM",
+        "bpyUsdValue": "107.72",
+        "bpyBatchPayments": [...pymts]
+      })
+    };
+
+    toast.success(
+      "Enviando lote!",
+      this.state.options
+    );
+
+    fetch("http://localhost:8090/batch/process", requestOptions).then((response) => {
+      toast.success(
+        "Confirmando lote!",
+        this.state.options
+      );
+      paymentsUpdated[index].info.total = response.status != 200 ? Number.NaN : response.bpyUsdValue;
+      paymentsUpdated[index].progress.colorClass = response.status != 200 ? 'danger' : 'success';
+      this.setState({
+        ...this.state,
+        tableStyles: paymentsUpdated
+      })
+      return response.json();
+    }).then((response) => { }
+    );
+  }
 }
 
 export default Static;
+
+export const mapper = [{ 'USA': 'ABA' },
+{ 'COL': 'BRANCH' },
+{ 'ALB': 'BRANCH' },
+{ 'DEU': 'BRANCH' },
+{ 'AGO': 'BRANCH' },
+{ 'HO1': 'BRANCH' },
+{ 'SAU': 'BRANCH' },
+{ 'ARG': 'BRANCH' },
+{ 'ARM': 'BRANCH' },
+{ 'AUS': 'BSB' },
+{ 'AUT': 'BRANCH' },
+{ 'BAR': 'BRANCH' },
+{ 'BEL': 'BRANCH' },
+{ 'BLR': 'BRANCH' },
+{ 'BOL': 'BRANCH' },
+{ 'BIH': 'BRANCH' },
+{ 'BOY': 'BRANCH' },
+{ 'BRA': 'BRANCH' },
+{ 'BRN': 'BRANCH' },
+{ 'BUC': 'BRANCH' },
+{ 'CPV': 'BRANCH' },
+{ 'KHM': 'BRANCH' },
+{ 'CAN': 'Transit' },
+{ 'CAC': 'BRANCH' },
+{ 'CHL': 'BRANCH' },
+{ 'CHN': 'CNAPS' },
+{ 'CAD': 'BRANCH' },
+{ 'COO': 'BRANCH' },
+{ 'COG': 'BRANCH' },
+{ 'CRI': 'BRANCH' },
+{ 'CUB': 'BRANCH' },
+{ 'DFM': 'BRANCH' },
+{ 'DNK': 'BRANCH' },
+{ 'ECU': 'BRANCH' },
+{ 'EGY': 'BRANCH' },
+{ 'SLV': 'BRANCH' },
+{ 'ARE': 'BRANCH' }];

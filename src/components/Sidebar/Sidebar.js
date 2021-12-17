@@ -78,8 +78,8 @@ class Sidebar extends React.Component {
                 }}
             >
                 <header className={s.logo}>
-                    <a href="https://demo.flatlogic.com/light-blue-react/">Light <span
-                        className="fw-bold">Blue</span></a>
+                    <a href="https://demo.flatlogic.com/light-blue-react/">Controlador <span
+                        className="fw-bold">Giros</span></a>
                 </header>
                 <ul className={s.nav}>
                     <LinksGroup
@@ -91,11 +91,11 @@ class Sidebar extends React.Component {
                         link="/app/main"
                         index="main"
                     />
-                    <h5 className={[s.navTitle, s.groupTitle].join(' ')}>TEMPLATE</h5>
+                    <h5 className={[s.navTitle, s.groupTitle].join(' ')}><span>2️⃣</span></h5>
                     <LinksGroup
                         onActiveSidebarItemChange={activeItem => this.props.dispatch(changeActiveSidebarItem(activeItem))}
                         activeItem={this.props.activeItem}
-                        header="Typography"
+                        header="Envios"
                         isHeader
                         iconName={<TypographyIcon className={s.menuIcon} />}
                         link="/app/typography"
@@ -104,7 +104,7 @@ class Sidebar extends React.Component {
                     <LinksGroup
                         onActiveSidebarItemChange={t => this.props.dispatch(changeActiveSidebarItem(t))}
                         activeItem={this.props.activeItem}
-                        header="Tables Basic"
+                        header="Parametros"
                         isHeader
                         iconName={<TablesIcon className={s.menuIcon} />}
                         link="/app/tables"
@@ -113,7 +113,7 @@ class Sidebar extends React.Component {
                     <LinksGroup
                         onActiveSidebarItemChange={activeItem => this.props.dispatch(changeActiveSidebarItem(activeItem))}
                         activeItem={this.props.activeItem}
-                        header="Notifications"
+                        header="Log"
                         isHeader
                         iconName={<NotificationsIcon className={s.menuIcon}/>}
                         link="/app/notifications"
@@ -141,7 +141,7 @@ class Sidebar extends React.Component {
                     />
                 </ul>
                 <h5 className={s.navTitle}>
-                    LABELS
+                    <span>3️⃣</span>
                     {/* eslint-disable-next-line */}
                 </h5>
                 {/* eslint-disable */}
@@ -149,25 +149,25 @@ class Sidebar extends React.Component {
                     <li>
                         <a href="#">
                             <i className="fa fa-circle text-success mr-2"/>
-                            <span className={s.labelName}>My Recent</span>
+                            <span className={s.labelName}>Actividad Reciente</span>
                         </a>
                     </li>
                     <li>
                         <a href="#">
                             <i className="fa fa-circle text-primary mr-2"/>
-                            <span className={s.labelName}>Starred</span>
+                            <span className={s.labelName}>Preferidos</span>
                         </a>
                     </li>
                     <li>
                         <a href="#">
                             <i className="fa fa-circle text-danger mr-2"/>
-                            <span className={s.labelName}>Background</span>
+                            <span className={s.labelName}>Seguimiento</span>
                         </a>
                     </li>
                 </ul>
                 {/* eslint-enable */}
                 <h5 className={s.navTitle}>
-                    PROJECTS
+                    TOTAL
                 </h5>
                 <div className={s.sidebarAlerts}>
                     {this.props.alertsList.map(alert => // eslint-disable-line

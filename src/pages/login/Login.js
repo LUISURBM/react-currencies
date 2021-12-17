@@ -125,7 +125,7 @@ class Login extends React.Component {
                     </Widget>
                 </Container>
                 <footer className="auth-footer">
-                {new Date().getFullYear()} &copy; Light Blue Template - React Admin Dashboard Template Made by <a href="https://flatlogic.com" rel="noopener noreferrer" target="_blank">Flatlogic LLC</a>.
+                {new Date().getFullYear()} &copy; CTD - <a href="https://www.colfuturo.org/" >COLFUTURO</a>
                 </footer>
             </div>
         );

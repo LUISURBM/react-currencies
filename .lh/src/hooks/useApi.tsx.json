@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useApi.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1636844622014,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1636844622014,
+            "name": "Commit-0",
+            "content": "import { useCallback, useState } from 'react'\r\nimport { ApiError, OpenAPI } from '../services/openapi'\r\n\r\nexport function useApi() {\r\n  const [error, setError] = useState<ApiError | undefined>(undefined)\r\n  const [isLoading, setIsloading] = useState<boolean>(true)\r\n\r\n  OpenAPI.BASE = process.env.REACT_APP_API_ENDPOINT as string\r\n  const handleRequest = useCallback(async function <T>(request: Promise<T>) {\r\n    setIsloading(true)\r\n    try {\r\n      const response = await request\r\n      setError(undefined)\r\n      return response\r\n    } catch (error) {\r\n      setError(error)\r\n    } finally {\r\n      setIsloading(true)\r\n    }\r\n  }, [])\r\n\r\n  function dismissError() {\r\n    setError(undefined)\r\n  }\r\n\r\n  return { dismissError, error, isLoading, handleRequest }\r\n}\r\n\r\nexport default useApi"
+        }
+    ]
+}

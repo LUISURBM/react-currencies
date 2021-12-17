@@ -45,7 +45,7 @@ import sender1 from "../../assets/people/a1.jpg";
 import sender2 from "../../assets/people/a5.jpg";
 import sender3 from "../../assets/people/a4.jpg";
 
-import avatar from "../../assets/people/a7.jpg";
+import avatar from "../../assets/people/admin.svg";
 
 import s from "./Header.module.scss";
 import "animate.css";
@@ -153,14 +153,7 @@ class Header extends React.Component {
           <UncontrolledAlert
             className={`${s.alert} mr-3 d-lg-down-none animate__animated animate__bounceIn animate__delay-1s`}
           >
-            Check out Light Blue{" "}
-            <button
-              className="btn-link"
-              onClick={() => this.setState({ settingsOpen: true })}
-            >
-              <SettingsIcon className={s.settingsIcon} />
-            </button>{" "}
-            on the right!
+            Bienvenido! {" "}
           </UncontrolledAlert>
           <Collapse
             className={`${s.searchCollapse} ml-lg-0 mr-md-3`}
@@ -216,7 +209,7 @@ class Header extends React.Component {
                 >
                   <img src={avatar} alt="..." />
                 </span>
-                <span className={`small d-sm-down-none ${s.accountCheck}`}>Philip smith</span>
+                <span className={`small d-sm-down-none ${s.accountCheck}`}>Admin</span>
                 <Badge className={`d-sm-down-none ${s.badge}`} color="danger">
                   9
                 </Badge>

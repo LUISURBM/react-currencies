@@ -20,6 +20,7 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      payments: 0,
       graph: null,
       checkedArr: [false, false, false],
     };
@@ -27,6 +28,20 @@ class Dashboard extends React.Component {
   }
 
   checkTable(id) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
+      'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+      'Authorization': 'Bearer '+localStorage.getItem('token')
+     },
+      body: JSON.stringify({ title: 'React POST Request Example' })
+  };
+    fetch("http://localhost:8090/payment/view",requestOptions).then((response) =>response.json()).then((response) => {
+        this.setState({...this.state, payments:response?.length});
+      }
+      );
     let arr = [];
     if (id === 0) {
       const val = !this.state.checkedArr[0];
@@ -129,7 +144,7 @@ class Dashboard extends React.Component {
                 <div className="col-md-3 col-12 text-center">
                   <span className="status rounded rounded-lg bg-default text-light">
                     <small>
-                      <AnimateNumber value={84} />%
+                      <AnimateNumber value={this.state.payments} />%
                     </small>
                   </span>
                 </div>
@@ -480,6 +495,10 @@ class Dashboard extends React.Component {
                 </button>
               </div>
             </Widget>
+          </Col>
+
+          <Col xs={12}>
+          <iframe width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZDg4YTI0MmQtZGRiNS00ZDEyLTk2NWUtYmNmYzM0NTUyMDUyIiwidCI6ImJhYjBiNjc5LWJkNWYtNGZlOC1iNTE2LWM2YjhiMzE3Yzc4MiIsImMiOjR9" frameborder="0" allowFullScreen="true"></iframe>
           </Col>
         </Row>
       </div>

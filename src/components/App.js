@@ -13,7 +13,6 @@ import LayoutComponent from '../components/Layout';
 import Login from '../pages/login';
 import Register from '../pages/register';
 import { logoutUser } from '../actions/user';
-
 const PrivateRoute = ({dispatch, component, ...rest }) => {
     if (!Login.isAuthenticated(JSON.parse(localStorage.getItem('authenticated')))) {
         dispatch(logoutUser());
